@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+<h1>Welcome, {{ username }}</h1>
+
+<h2>Routines List</h2>
+<table>
+    <tr>
+        <th>Routine Name</th>
+        <th>Routine Runtime</th>
+        <th>Start Time</th>
+        <th>Stop Time</th>
+        <th>Details</th>
+    </tr>
+
+    {% for routine in routines %}
+    <tr>
+        <td>routine[1]</td>
+        <td>routine[7]</td>
+        <td>routine[5]</td>
+        <td>routine[6]</td>
+        <td><a href = "{{ url_for('routine_details', routine_name = routine[1]}}"></a></td>
+    </tr>
+
+    {% endfor %}
+</table>
+<br>
+<br>
+<br>
+
+</body>
+</html>
