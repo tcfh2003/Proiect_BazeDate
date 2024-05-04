@@ -57,7 +57,7 @@ CREATE TABLE Routine (
     Stop_Time TIME, 
     Routine_RunTime VARCHAR(40) NOT NULL,
     FOREIGN KEY  (Routine_RunTime) REFERENCES RoutineRunTimes (RoutineRunTimes),
-    CONSTRAINT NoNullTimeWindow CHECK (Routine_RunTime != 'TimeWindow' OR (Start_Time != NULL AND Stop_Time != NULL))
+    CONSTRAINT NoNullTimeWindow CHECK (Routine_RunTime != 'TimeWindow' OR (Start_Time IS NOT NULL AND Stop_Time IS NOT NULL))
 );
 
 CREATE TABLE SensorList (
@@ -148,16 +148,16 @@ BEGIN
 		SET NEW.Routine_RunTime = OLD.Routine_RunTime;
 	END IF;
     
-    IF (NEW.Start_Time = NULL AND NEW.Routine_RunTime = 'TimeWindow') THEN
-		IF(OLD.Start_Time != NULL) THEN
+    IF (NEW.Start_Time IS NULL AND NEW.Routine_RunTime = 'TimeWindow') THEN
+		IF(OLD.Start_Time IS NOT NULL) THEN
 			SET NEW.Start_Time = OLD.Start_Time;
 		ELSE
 			SET NEW.Start_Time = '00:00';
 		END IF;
 	END IF;
     
-    IF (NEW.Stop_Time = NULL AND NEW.Routine_RunTime = 'TimeWindow') THEN
-		IF(OLD.Stop_Time != NULL) THEN
+    IF (NEW.Stop_Time IS NULL AND NEW.Routine_RunTime = 'TimeWindow') THEN
+		IF(OLD.Stop_Time IS NOT NULL) THEN
 			SET NEW.Stop_Time = OLD.Stop_Time;
 		ELSE
 			SET NEW.Stop_Time = '00:00';
@@ -224,6 +224,5 @@ SELECT (@time_now >= @start_time AND @time_now < @stop_time);
 
 SELECT TIME(NOW());
 SELECT IsActiveNow(@stop_time, @start_time);
-
 
 UPDATE Routine SET RoutineName = "<nochange>", Start_Time = NULL, Stop_Time = NULL, Routine_RunTime = "<nochange>" WHERE RoutineID = 5;
