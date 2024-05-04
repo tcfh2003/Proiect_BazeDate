@@ -10,6 +10,7 @@
     <h2>Routines List</h2>
     <table border="1">
         <tr>
+            <th>Routine ID</th>
             <th>Routine Name</th>
             <th>Routine Runtime</th>
             <th>Start Time</th>
@@ -19,6 +20,7 @@
 
         {% for routine in routines %}
         <tr>
+            <td>{{ routine[0] }}</td>
             <td>{{ routine[1] }}</td>
             <td>{{ routine[4] }}</td>
             <td>{{ routine[2] }}</td>
@@ -52,6 +54,33 @@
 
         <button type="submit">Add Routine</button>
     </form>
+    <br>
+    <br>
+    <br>
+    <h2>Modify Routine</h2>
+    <form action = "/modify_routine" method = "POST">
+        <label for="routineID">Routine ID:</label>
+        <input type = "text" id="routineID" name="routineID"><br>
+
+        <label for="routine_name">Routine Name: </label>
+        <input type="text" id="routine_name" name="routine_name"><br>
+
+        <label for="routine_runtime">Routine Runtime: </label>
+        <select id="routine_runtime" name="routine_runtime">
+            {% for runtime in routineRuntimes %}
+            <option value="{{ runtime[0] }}"> {{ runtime[0] }} </option>
+            {% endfor %}
+        </select><br>
+
+        <label for="start_time">Start Time: </label>
+        <input type="text" id="start_time" name="start_time" value="NULL"><br>
+
+        <label for="stop_time">Stop Time: </label>
+        <input type="text" id="stop_time" name="stop_time" value="NULL"><br>
+
+        <button type="submit">Modify Routine</button>
+    </form>
+    <p>{{ modify_routine_status }}</p>
     <br>
     <br>
     <br>

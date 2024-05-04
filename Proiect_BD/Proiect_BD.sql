@@ -109,19 +109,15 @@ END $$
 DELIMITER ;
 
 
-SET GLOBAL log_bin_trust_function_creators = 1;
 DROP FUNCTION IF EXISTS IsActiveNow;
 DELIMITER $$
-CREATE FUNCTION IsActiveNow(RoutineID INT) RETURNS BOOL
-NOT DETERMINISTIC
+CREATE FUNCTION IsActiveNow(start_time TIME, stop_time TIME) RETURNS BOOL
+DETERMINISTIC
 CONTAINS SQL
 BEGIN
 	DECLARE time_now TIME;
-    DECLARE start_time TIME;
-    DECLARE stop_time TIME;
-    SELECT TIME(NOW()) INTO time_now;
-    SELECT Start_Time FROM Routine AS r WHERE r.RoutineID = RoutineID INTO start_time;
-    SELECT Stop_Time FROM Routine AS r WHERE r.RoutineID = RoutineID INTO stop_time;
+    SET time_now = TIME(NOW());
+    
     IF(start_time <= stop_time) THEN
 		IF(time_now >= start_time AND time_now < stop_time) THEN
 			RETURN TRUE;
@@ -183,5 +179,14 @@ DELETE FROM IPAddressSpace WHERE IP_Address = '192.168.2.150';
 SELECT * FROM Sensors WHERE SensorID IN (SELECT SensorID FROM SensorList WHERE RoutineID IN (SELECT RoutineID FROM Routine));
 SELECT * FROM Effectors WHERE EffectorID IN (SELECT EffectorID FROM EffectorList WHERE RoutineID IN (SELECT RoutineID FROM Routine));
 
+
+
+SELECT @time_now := TIME(NOW());
+SELECT Start_Time, Stop_Time INTO @start_time, @stop_time FROM Routine AS r WHERE r.RoutineID = 5;
+SELECT @time_now, @start_time, @stop_time;
+
+SELECT (@start_time <= @stop_time);
+SELECT (@time_now >= @start_time AND @time_now < @stop_time);
+
 SELECT TIME(NOW());
-SELECT IsActiveNow(2);
+SELECT IsActiveNow(@stop_time, @start_time);

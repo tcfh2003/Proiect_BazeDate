@@ -25,6 +25,11 @@ def hash_password(password):
 
 # global variables go here
 username = ""
+sensor_add_status = ""
+sensor_delete_status = ""
+effector_add_status = ""
+effector_delete_status = ""
+modify_routine_status = ""
 
 
 @app.route('/')
@@ -68,7 +73,17 @@ def home():
     cursor.execute("SELECT * FROM RoutineRuntimes")
     routineRuntimes = cursor.fetchall()
     cursor.close()
-    return render_template("home.html", routines = routines , username = username, routineRuntimes = routineRuntimes)
+    global sensor_add_status
+    sensor_add_status = ""
+    global sensor_delete_status
+    sensor_delete_status = ""
+    global effector_add_status
+    effector_add_status = ""
+    global effector_delete_status
+    effector_delete_status = ""
+    global modify_routine_status
+    return render_template("home.html", routines = routines , username = username, routineRuntimes = routineRuntimes,
+                           modify_routine_status = modify_routine_status)
 
 
 @app.route('/add_routine', methods=['POST'])
@@ -87,32 +102,182 @@ def add_routine():
         return redirect(url_for('home'))
 
 
+@app.route('/modify_routine', methods=['POST'])
+def modify_routine():
+    if request.method == 'POST':
+        routineID = request.form['routineID']
+        routine_name = request.form['routine_name']
+        routine_runtime = request.form['routine_runtime']
+        start_time = request.form['start_time']
+        stop_time = request.form['stop_time']
+
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT COUNT(*) FROM Routine WHERE RoutineID = %s", (routineID,))
+        result = cursor.fetchone()
+        if result[0] == 1:
+            cursor.execute("UPDATE Routine SET RoutineName = %s , Routine_RunTime = %s , Start_Time = %s , Stop_Time = %s WHERE RoutineID = %s",
+                           (routine_name, routine_runtime, start_time, stop_time, routineID))
+            cursor.connection.commit()
+            cursor.close()
+            modify_routine_status = ""
+            return redirect(url_for('home'))
+        else:
+            modify_routine_status = "The Routine ID entered doesn't exist"
+            return redirect(url_for('home'))
+
+
 @app.route('/routine/<string:routine_name>')
 def routine_details(routine_name):
     cursor = mysql.connection.cursor()
-    cursor.execute("SELECT * FROM Sensors WHERE SensorID IN (SELECT SensorID FROM SensorList WHERE RoutineID IN (SELECT RoutineID FROM Routine))")
-    sensors = cursor.fetchall()
-    cursor.execute("SELECT * FROM Effectors WHERE EffectorID IN (SELECT EffectorID FROM EffectorList WHERE RoutineID IN (SELECT RoutineID FROM Routine))")
-    effectors = cursor.fetchall()
     cursor.execute("SELECT RoutineID FROM Routine WHERE RoutineName = %s", (routine_name,))
     routine_id = cursor.fetchone()
+    cursor.execute("SELECT * FROM Sensors WHERE SensorID IN (SELECT SensorID FROM SensorList WHERE RoutineID = %s)", (routine_id,))
+    sensors = cursor.fetchall()
+    cursor.execute("SELECT * FROM Effectors WHERE EffectorID IN (SELECT EffectorID FROM EffectorList WHERE RoutineID = %s)", (routine_id,))
+    effectors = cursor.fetchall()
     cursor.execute("SELECT Routine_Runtime FROM Routine WHERE RoutineID = %s", (routine_id,))
     routine_runtime = cursor.fetchone()
 
     if routine_runtime[0] == 'Continuous':
         activation_state = 'Active'
     elif routine_runtime[0] == 'TimeWindow':
-        cursor.execute("SELECT IsActiveNow(%s)", (routine_id,))
+        cursor.execute("SELECT Start_Time, Stop_Time FROM Routine WHERE RoutineID = %s", (routine_id,))
+        time_window = cursor.fetchone()
+        start_time = str(time_window[0])
+        stop_time = str(time_window[1])
+        cursor.execute("SELECT IsActiveNow(%s, %s)", (start_time, stop_time))
         activation_state = cursor.fetchone()
-        if activation_state == 0 :
+        if activation_state[0] == 1:
             activation_state = 'Active'
         else:
             activation_state = 'Inactive'
+    else:
+        activation_state = 'Unknown'
 
     cursor.close()
+    global sensor_add_status
+    global sensor_delete_status
+    global effector_add_status
+    global effector_delete_status
     return render_template('routine_details.html' , routine_name = routine_name , activation_state = activation_state ,
-                           sensors = sensors , effectors = effectors)
+                           sensors = sensors , effectors = effectors, sensor_add_status = sensor_add_status , sensor_delete_status = sensor_delete_status,
+                           effector_add_status = effector_add_status , effector_delete_status = effector_delete_status)
 
+
+@app.route('/routine/<string:routine_name>/add_routine_sensor' , methods = ['POST'])
+def add_routine_sensor(routine_name):
+    if request.method == 'POST':
+        global sensor_add_status
+        sensor_name = request.form['sensor_name']
+
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT COUNT(*) FROM Sensors WHERE Sensor_Name = %s", (sensor_name,))
+        exists = cursor.fetchone()
+        print(exists)
+        if exists[0] == 1:
+            cursor.execute("SELECT RoutineID FROM Routine WHERE RoutineName = %s", (routine_name,))
+            routine_id = cursor.fetchone()
+            cursor.execute("SELECT SensorID FROM Sensors WHERE Sensor_Name = %s", (sensor_name,))
+            sensor_id = cursor.fetchone()
+            cursor.execute("INSERT INTO SensorList (SensorID, RoutineID) VALUES (%s, %s)", (sensor_id, routine_id))
+            cursor.connection.commit()
+            cursor.close()
+            sensor_add_status = ""
+            return redirect(url_for('routine_details', routine_name = routine_name))
+        else:
+            sensor_add_status = "The sensor you have entered doesn't exist"
+            cursor.close()
+            return redirect(url_for('routine_details', routine_name = routine_name , sensor_add_status = sensor_add_status))
+
+
+@app.route('/routine/<string:routine_name>/delete_routine_sensor' , methods = ['POST'])
+def delete_routine_sensor(routine_name):
+    if request.method == 'POST':
+        global sensor_delete_status
+        sensor_name = request.form['sensor_name']
+
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT COUNT(*) FROM Sensors WHERE Sensor_Name = %s", (sensor_name,))
+        exists = cursor.fetchone()
+        if exists[0] == 1:
+            cursor.execute("SELECT RoutineID FROM Routine WHERE RoutineName = %s", (routine_name,))
+            routine_id = cursor.fetchone()
+            cursor.execute("SELECT SensorID FROM Sensors WHERE Sensor_Name = %s", (sensor_name,))
+            sensor_id = cursor.fetchone()
+            cursor.execute("DELETE FROM SensorList WHERE SensorID = %s AND RoutineID = %s", (sensor_id, routine_id))
+            mysql.connection.commit()
+            cursor.close()
+            sensor_delete_status = ""
+            return redirect(url_for('routine_details', routine_name = routine_name))
+        else:
+            sensor_delete_status = "The sensor you have entered doesn't exist"
+            cursor.close()
+            return redirect(url_for('routine_details', routine_name = routine_name))
+
+
+@app.route('/routine/<string:routine_name>/add_routine_effector' , methods = ['POST'])
+def add_routine_effector(routine_name):
+    if request.method == 'POST':
+        global effector_add_status
+        effector_name = request.form['effector_name']
+
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT COUNT(*) FROM Effectors WHERE Effector_Name = %s", (effector_name,))
+        exists = cursor.fetchone()
+        if exists[0] == 1:
+            cursor.execute("SELECT RoutineID FROM Routine WHERE RoutineName = %s", (routine_name,))
+            routine_id = cursor.fetchone()
+            cursor.execute("SELECT EffectorID FROM Effectors WHERE Effector_Name = %s", (effector_name,))
+            effector_id = cursor.fetchone()
+            cursor.execute("INSERT INTO EffectorList (EffectorID, RoutineID) VALUES (%s, %s)", (effector_id, routine_id))
+            cursor.connection.commit()
+            cursor.close()
+            effector_add_status = ""
+            return redirect(url_for('routine_details', routine_name = routine_name))
+        else:
+            effector_add_status = "The effector you have entered doesn't exist"
+            cursor.close()
+            return redirect(url_for('routine_details', routine_name = routine_name))
+
+
+@app.route('/routine/<string:routine_name>/delete_routine_effector' , methods = ['POST'])
+def delete_routine_effector(routine_name):
+    if request.method == 'POST':
+        global effector_delete_status
+        effector_name = request.form['effector_name']
+
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT COUNT(*) FROM Effectors WHERE Effector_Name = %s", (effector_name,))
+        exists = cursor.fetchone()
+        if exists[0] == 1:
+            cursor.execute("SELECT RoutineID FROM Routine WHERE RoutineName = %s", (routine_name,))
+            routine_id = cursor.fetchone()
+            cursor.execute("SELECT EffectorId FROM Effectors WHERE Effector_Name = %s", (effector_name,))
+            effector_id = cursor.fetchone()
+            cursor.execute("DELETE FROM EffectorList WHERE EffectorID = %s AND RoutineID = %s", (effector_id, routine_id))
+            mysql.connection.commit()
+            cursor.close()
+            effector_delete_status = ""
+            return redirect(url_for('routine_details', routine_name = routine_name))
+        else:
+            effector_delete_status = "The effector you have entered doesn't exist"
+            cursor.close()
+            return redirect(url_for('routine_details', routine_name = routine_name))
+
+
+@app.route('/routine/<string:routine_name>/delete_routine' , methods = ['POST'])
+def delete_routine(routine_name):
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT RoutineID FROM Routine WHERE RoutineName = %s", (routine_name,))
+    routine_id = cursor.fetchone()
+    cursor.execute("DELETE FROM SensorList WHERE RoutineID = %s", (routine_id,))
+    cursor.connection.commit()
+    cursor.execute("DELETE FROM EffectorList WHERE RoutineID = %s", (routine_id,))
+    cursor.connection.commit()
+    cursor.execute("DELETE FROM Routine WHERE RoutineID = %s", (routine_id,))
+    cursor.connection.commit()
+    cursor.close()
+    return redirect(url_for('home'))
 
 
 @app.route('/sensors')
