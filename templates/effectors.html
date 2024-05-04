@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Effectors Panel</title>
+</head>
+<body>
+    <h2>Effectors List</h2>
+    <table>
+        <tr>
+            <th>Effector ID</th>
+            <th>Effector Name</th>
+            <th>Effector Type</th>
+            <th>IP Address</th>
+            <th>Protocol</th>
+            <th>Subnet</th>
+            <th>Gateway</th>
+        </tr>
+
+        {% for effector in effectors %}
+        <tr>
+            <td>{{ effector[0] }}</td>
+            <td>{{ effector[1] }}</td>
+            <td>{{ effector[2] }}</td>
+            <td>{{ effector[3] }}</td>
+            <td>{{ effector[5] }}</td>
+            <td>{{ effector[6] }}</td>
+            <td>{{ effector[7] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <br>
+    <br>
+
+    <h2>Add effector</h2>
+    <form action="/add_effector" metod="POST">
+        <label for="effector_name">Effector Name: </label>
+        <input type="text" id="effector_name" name="effector_name"><br>
+
+        <label for="effector_type">Sensor Type: </label>
+        <select id="effector_type" name="effector_type">
+            {% for types in effectorTypes %}
+            <option value="{{ type[1] }}"> {{ type[1] }} </option>
+            {% endfor %}
+        </select><br>
+
+        <label for="ip_address">IP Address: </label>
+        <input type="text" id="ip_address" name="ip_address"><br>
+
+        <label for="protocol">Protocol: </label>
+        <input type="text" id="protocol" name="protocol"><br>
+
+        <label for="subnet">Subnet Mask: </label>
+        <input type="text" id="subnet" name="subnet"><br>
+
+        <label for="gateway">Gateway: </label>
+        <input type="gateway" id="gateway" name="gateway"><br>
+
+        <button type="submit">Add Sensor</button>
+    </form>
+
+    <h2>Remove effector</h2>
+    <form action="/remove_effector" method="POST">
+        <label for="effector_name">Effector name:</label>
+        <input type="text" id = "effector_name" name="effector_name"><br>
+
+        <button type="submit">Remove Effector</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sensors Panel</title>
+</head>
+<body>
+    <h2>Sensors List</h2>
+    <table>
+        <tr>
+            <th>Sensor ID</th>
+            <th>Sensor Name</th>
+            <th>Sensor Type</th>
+            <th>IP Address</th>
+            <th>Protocol</th>
+            <th>Subnet</th>
+            <th>Gateway</th>
+        </tr>
+
+        {% for sensor in sensors %}
+        <tr>
+            <td>{{ sensor[0] }}</td>
+            <td>{{ sensor[1] }}</td>
+            <td>{{ sensor[2] }}</td>
+            <td>{{ sensor[3] }}</td>
+            <td>{{ sensor[5] }}</td>
+            <td>{{ sensor[6] }}</td>
+            <td>{{ sensor[7] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <br>
+    <br>
+
+    <h2>Add sensor</h2>
+    <form action="/add_sensor" metod="POST">
+        <label for="sensor_name">Sensor Name: </label>
+        <input type="text" id="sensor_name" name="sensor_name"><br>
+
+        <label for="sensor_type">Sensor Type: </label>
+        <select id="sensor_type" name="sensor_type">
+            {% for types in sensorTypes %}
+            <option value="{{ type[1] }}"> {{ type[1] }} </option>
+            {% endfor %}
+        </select><br>
+
+        <label for="ip_address">IP Address: </label>
+        <input type="text" id="ip_address" name="ip_address"><br>
+
+        <label for="protocol">Protocol: </label>
+        <input type="text" id="protocol" name="protocol"><br>
+
+        <label for="subnet">Subnet Mask: </label>
+        <input type="text" id="subnet" name="subnet"><br>
+
+        <label for="gateway">Gateway: </label>
+        <input type="gateway" id="gateway" name="gateway"><br>
+
+        <button type="submit">Add Sensor</button>
+    </form>
+
+    <h2>Remove sensor</h2>
+    <form action="/remove_sensor" method="POST">
+        <label for="sensor_name">Sensor name:</label>
+        <input type="text" id = "sensor_name" name="sensor_name"><br>
+
+        <button type="submit">Remove Sensor</button>
+    </form>
+</body>
+</html>

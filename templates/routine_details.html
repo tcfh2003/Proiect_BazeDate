@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Routine details</title>
+</head>
+<body>
+    <h2>Details for {{ routine_name }}</h2>
+
+    <h4>Active Now? - </h4> {{ activation_state }}
+
+    <h3>Sensors used in routine:</h3>
+    <table>
+        <tr>
+            <th>Sensor Name</th>
+            <th>Sensor Type</th>
+            <th>IP Address</th>
+        </tr>
+
+        {% for sensor in sensors %}
+        <tr>
+            <td>{{ sensor[1] }}</td>
+            <td>{{ sensor[2] }}</td>
+            <td>{{ sensor[3] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <br>
+    <br>
+    <h3>Effectors used in routine:</h3>
+    <table>
+        <tr>
+            <th>Effector Name</th>
+            <th>Effector Type</th>
+            <th>IP Address</th>
+        </tr>
+
+        {% for effector in effectors %}
+        <tr>
+            <td>{{ effector[1] }}</td>
+            <td>{{ effector[2] }}</td>
+            <td>{{ effector[3] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <br>
+    <br>
+
+
+
+    <h3>Add sensors</h3>
+    <form action = "{{ url_for('add_routine_sensor', routine_name = routine_name) }}" method="POST">
+        <label for="sensor_name">Sensor Name: </label>
+        <input type="text" id="sensor_name" name="sensor_name"><br>
+        <button type="submit">Add Sensor</button>
+    </form>
+    <p>{{ sensor_add_status }}</p>
+    <br>
+    <h3>Delete sensors</h3>
+    <form action = "{{ url_for('delete_routine_sensor', routine_name = routine_name) }}" method="POST">
+        <label for="sensor_name">Sensor Name: </label>
+        <input type="text" id="sensor_name" name="sensor_name"><br>
+        <button type="submit">Delete Sensor</button>
+    </form>
+    <p>{{ sensor_delete_status }}</p>
+    <br>
+    <br>
+    <br>
+
+
+
+    <h3>Add efectors</h3>
+    <form action = "{{ url_for('add_routine_effector', routine_name = routine_name) }}" method="POST">
+        <label for="effector_name">Effector Name: </label>
+        <input type="text" id="effector_name" name="effector_name"><br>
+        <button type="submit">Add Effector</button>
+    </form>
+    <p>{{ effector_add_status }}</p>
+    <br>
+    <h3>Delete effectors</h3>
+    <form action = "{{ url_for('delete_routine_effector', routine_name = routine_name) }}" method="POST">
+        <label for="effector_name">Effector Name: </label>
+        <input type="text" id="effector_name" name="effector_name"><br>
+        <button type="submit">Delete Effector</button>
+    </form>
+    <p>{{ effector_delete_status }}</p>
+    <br>
+    <br>
+    <br>
+
+
+    <h3>Delete routine</h3>
+    <form action = "{{ url_for('delete_routine', routine_name = routine_name) }}" method="POST">
+        <button type="submit">Delete</button>
+    </form>
+
+</body>
+</html>
