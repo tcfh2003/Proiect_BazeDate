@@ -8,7 +8,7 @@
     <h1>Welcome, {{ username }}</h1>
 
     <h2>Routines List</h2>
-    <table>
+    <table border="1">
         <tr>
             <th>Routine Name</th>
             <th>Routine Runtime</th>
@@ -40,7 +40,7 @@
         <label for="routine_runtime">Routine Runtime: </label>
         <select id="routine_runtime" name="routine_runtime">
             {% for runtime in routineRuntimes %}
-            <option value="{{ runtime }}"> {{ runtime }} </option>
+            <option value="{{ runtime[0] }}"> {{ runtime[0] }} </option>
             {% endfor %}
         </select><br>
 
@@ -56,7 +56,7 @@
     <br>
     <br>
 
-    <h4><a href="/sensors">Sensors Panel</a> </h4>
-    <h4><a href="/effectors">Effectors Panel</a></h4>
+    <h4><a href="{{ url_for('sensors') }}">Sensors Panel</a> </h4>
+    <h4><a href="{{ url_for('effectors') }}">Effectors Panel</a></h4>
 </body>
 </html>

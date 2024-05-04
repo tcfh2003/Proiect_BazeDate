@@ -6,7 +6,7 @@
 </head>
 <body>
     <h2>Effectors List</h2>
-    <table>
+    <table border="1">
         <tr>
             <th>Effector ID</th>
             <th>Effector Name</th>
@@ -34,14 +34,14 @@
     <br>
 
     <h2>Add effector</h2>
-    <form action="/add_effector" metod="POST">
+    <form action="/effectors/add_effector" method="POST">
         <label for="effector_name">Effector Name: </label>
         <input type="text" id="effector_name" name="effector_name"><br>
 
         <label for="effector_type">Sensor Type: </label>
         <select id="effector_type" name="effector_type">
-            {% for types in effectorTypes %}
-            <option value="{{ type[1] }}"> {{ type[1] }} </option>
+            {% for type in effectorTypes %}
+            <option value="{{ type[0] }}"> {{ type[0] }} </option>
             {% endfor %}
         </select><br>
 
@@ -57,11 +57,11 @@
         <label for="gateway">Gateway: </label>
         <input type="gateway" id="gateway" name="gateway"><br>
 
-        <button type="submit">Add Sensor</button>
+        <button type="submit">Add Effector</button>
     </form>
 
     <h2>Remove effector</h2>
-    <form action="/remove_effector" method="POST">
+    <form action="/effectors/remove_effector" method="POST">
         <label for="effector_name">Effector name:</label>
         <input type="text" id = "effector_name" name="effector_name"><br>
 

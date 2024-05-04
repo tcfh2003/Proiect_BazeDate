@@ -6,7 +6,7 @@
 </head>
 <body>
     <h2>Sensors List</h2>
-    <table>
+    <table border="1">
         <tr>
             <th>Sensor ID</th>
             <th>Sensor Name</th>
@@ -34,14 +34,14 @@
     <br>
 
     <h2>Add sensor</h2>
-    <form action="/add_sensor" metod="POST">
+    <form action="/sensors/add_sensor" method="POST">
         <label for="sensor_name">Sensor Name: </label>
         <input type="text" id="sensor_name" name="sensor_name"><br>
 
         <label for="sensor_type">Sensor Type: </label>
         <select id="sensor_type" name="sensor_type">
-            {% for types in sensorTypes %}
-            <option value="{{ type[1] }}"> {{ type[1] }} </option>
+            {% for type in sensorTypes %}
+            <option value="{{ type[0] }}"> {{ type[0] }} </option>
             {% endfor %}
         </select><br>
 
@@ -61,7 +61,7 @@
     </form>
 
     <h2>Remove sensor</h2>
-    <form action="/remove_sensor" method="POST">
+    <form action="/sensors/remove_sensor" method="POST">
         <label for="sensor_name">Sensor name:</label>
         <input type="text" id = "sensor_name" name="sensor_name"><br>
 

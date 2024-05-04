@@ -8,7 +8,7 @@ CREATE TABLE UserPrivileges (
 CREATE TABLE User (
 	UserID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     Username VARCHAR(40) NOT NULL,
-    Password BIGINT,
+    Password VARCHAR(255) NOT NULL,
     User_Privileges VARCHAR(40) NOT NULL,
     FOREIGN KEY (User_Privileges) REFERENCES UserPrivileges (UserPrivileges)
 );
@@ -109,10 +109,11 @@ END $$
 DELIMITER ;
 
 
+SET GLOBAL log_bin_trust_function_creators = 1;
 DROP FUNCTION IF EXISTS IsActiveNow;
 DELIMITER $$
 CREATE FUNCTION IsActiveNow(RoutineID INT) RETURNS BOOL
-DETERMINISTIC
+NOT DETERMINISTIC
 CONTAINS SQL
 BEGIN
 	DECLARE time_now TIME;
@@ -141,10 +142,10 @@ DELIMITER ;
 
 INSERT INTO UserPrivileges VALUES ('Read_Data') , ('Read/Write_Data');
 INSERT INTO User(Username, Password, User_Privileges) VALUES 
-	('Admin', -727466484198500370, 'Read/Write_Data'),			-- pw = root
-    ('Andrei', -2157112463720918891, 'Read_Data'),				-- pw = parola1
-    ('Theo', 411000835731426486, 'Read_Data'),					-- pw = parola2
-    ('Emi', -5653120683680813595, 'Read_Data');					-- pw = parola3
+	('Admin', '4813494d137e1631bba301d5acab6e7bb7aa74ce1185d456565ef51d737677b2', 'Read/Write_Data'),			-- pw = root
+    ('Andrei', '65bb1cc2fd5feddea98e1d9e3ec89fae2a3f50ed42d6fb96962ef8cd0e2cfcb7', 'Read_Data'),				-- pw = parola1
+    ('Theo', '102c304fa0934097958dfb45fec492d8a4f1610c33211944a5a1eeefa4c93de5', 'Read_Data'),					-- pw = parola2
+    ('Emi', '8e1f27aaf4f508836284575560431e21f1990ee35909c0233c747d8ba82e82b8', 'Read_Data');					-- pw = parola3
 
 INSERT INTO SensorType VALUES ('MovementSensor') , ('TemperatureSensor') , ('HumiditySensor') , ('LightSensor');
 INSERT INTO EffectorType VALUES ('Lightbulb') , ('AirConditioner') , ('Heater');
@@ -183,4 +184,4 @@ SELECT * FROM Sensors WHERE SensorID IN (SELECT SensorID FROM SensorList WHERE R
 SELECT * FROM Effectors WHERE EffectorID IN (SELECT EffectorID FROM EffectorList WHERE RoutineID IN (SELECT RoutineID FROM Routine));
 
 SELECT TIME(NOW());
-SELECT IsActiveNow((SELECT Start_Time FROM Routine WHERE RoutineID = 2) , (SELECT Stop_Time FROM Routine WHERE RoutineID = 2));
+SELECT IsActiveNow(2);
