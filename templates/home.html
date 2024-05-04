@@ -63,10 +63,11 @@
         <input type = "text" id="routineID" name="routineID"><br>
 
         <label for="routine_name">Routine Name: </label>
-        <input type="text" id="routine_name" name="routine_name"><br>
+        <input type="text" id="routine_name" name="routine_name" value="<nochange>"><br>
 
         <label for="routine_runtime">Routine Runtime: </label>
-        <select id="routine_runtime" name="routine_runtime">
+        <select id="routine_runtime" name="routine_runtime" value="<nochange>">
+            <option value="<nochange>">&ltnochange&gt</option>
             {% for runtime in routineRuntimes %}
             <option value="{{ runtime[0] }}"> {{ runtime[0] }} </option>
             {% endfor %}
