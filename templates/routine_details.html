@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Routine details</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'style.css') }}">
 </head>
 <body>
     <h2>Details for {{ routine_name }}</h2>
 
-    <p><b>Active Now? - </b> {{ activation_state }} </p>
+    <p style="color: {{ "green" if activation_state == "Active" else "red" }}"><b style="color: black">Active Now? - </b> <b>{{ activation_state }}</b> </p>
 
     <h3>Sensors used in routine:</h3>
     <table border="1">

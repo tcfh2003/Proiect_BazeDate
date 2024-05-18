@@ -3,22 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'style.css') }}">
 </head>
 
 <body>
     <h2>Login</h2>
     <p>
     <form action = "{{ url_for('login_form') }}", method = "POST">
-        <h4>Username: </h4>
-        <input type = "text" name = "username"> <br>
-        <h4>Password: </h4>
-        <input type = "password" name = "password"> <br>
+        <h4 style = "padding-left: 20px">Username: </h4>
+        <input type = "text" name = "username", style = "margin-left: 20px"> <br>
+        <h4 style = "padding-left: 20px">Password: </h4>
+        <input type = "password" name = "password", style = "margin-left: 20px"> <br>
         <br>
         <button type = "submit">Login!</button>
     </form>
     </p>
+    <h3>{{ login_info }}</h3>
 </body>
-
-<h3>{{ login_info }}</h3>
-
 </html>
