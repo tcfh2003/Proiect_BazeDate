@@ -58,6 +58,7 @@ CREATE TABLE Routine (
     Routine_RunTime VARCHAR(40) NOT NULL,
     FOREIGN KEY  (Routine_RunTime) REFERENCES RoutineRunTimes (RoutineRunTimes),
     CONSTRAINT NoNullTimeWindow CHECK (Routine_RunTime != 'TimeWindow' OR (Start_Time IS NOT NULL AND Stop_Time IS NOT NULL))
+    -- If the runtime of the routine is not a time window (aka  it's continuous), check that both Start_Time and Stop_Time are NOT NULL
 );
 
 CREATE TABLE SensorList (
@@ -91,7 +92,9 @@ BEGIN
     INSERT INTO Sensors (Sensor_Name, Sensor_Type, IP_Address) VALUES (SensorName, SensorType, IP_Address);
 END $$
 DELIMITER ;
-
+-- if the ip address provided is already in the IpAddressSpace table, it updates it using the provided data
+-- else, it simply adds it to the IpAddressSpace table
+-- then, it inserts the provided sensor (aka its data) in the Sensors table
 
 
 DROP PROCEDURE IF EXISTS AddEffector;
@@ -108,6 +111,9 @@ BEGIN
     INSERT INTO Effectors (Effector_Name, Effector_Type, IP_Address) VALUES (EffectorName, EffectorType, IP_Address);
 END $$
 DELIMITER ;
+-- if the ip address provided is already in the IpAddressSpace table, it updates it using the provided data
+-- else, it simply adds it to the IpAddressSpace table
+-- then, it inserts the provided effector (aka its data) in the Effectors table
 
 
 DROP FUNCTION IF EXISTS IsActiveNow;
@@ -134,6 +140,7 @@ BEGIN
 	END IF;
 END $$
 DELIMITER ;
+-- stores current time in the variable time_now, then checks if it is in the provided time interval and returns a boolean value
 
 
 DROP TRIGGER IF EXISTS NoChangeOnRoutineModify;
@@ -163,9 +170,10 @@ BEGIN
 			SET NEW.Stop_Time = '00:00';
 		END IF;
 	END IF;
-    
 END $$
 DELIMITER ;
+-- On update in Routine table, if the provided routine name and runtime are "<nochange>", then keep the old value
+-- if the provided runtime is a time window and the old Start_Time/Stop_Time are NOT NULL, then keep the old values, else make them '00:00' 
 
 
 -- ------------------------------------------------------------------------------------------------------
@@ -175,7 +183,8 @@ INSERT INTO User(Username, Password, User_Privileges) VALUES
 	('Admin', '4813494d137e1631bba301d5acab6e7bb7aa74ce1185d456565ef51d737677b2', 'Read/Write_Data'),			-- pw = root
     ('Andrei', '65bb1cc2fd5feddea98e1d9e3ec89fae2a3f50ed42d6fb96962ef8cd0e2cfcb7', 'Read_Data'),				-- pw = parola1
     ('Theo', '102c304fa0934097958dfb45fec492d8a4f1610c33211944a5a1eeefa4c93de5', 'Read_Data'),					-- pw = parola2
-    ('Emi', '8e1f27aaf4f508836284575560431e21f1990ee35909c0233c747d8ba82e82b8', 'Read_Data');					-- pw = parola3
+    ('Emi', '8e1f27aaf4f508836284575560431e21f1990ee35909c0233c747d8ba82e82b8', 'Read_Data');					-- pw = parola3    
+-- passwords are stored as SHA-256 hashes
 
 INSERT INTO SensorType VALUES ('MovementSensor') , ('TemperatureSensor') , ('HumiditySensor') , ('LightSensor');
 INSERT INTO EffectorType VALUES ('Lightbulb') , ('AirConditioner') , ('Heater');
@@ -203,6 +212,8 @@ INSERT INTO Effectors VALUES
 INSERT INTO SensorList (SensorID , RoutineID) VALUES (1 , 1);
 INSERT INTO EffectorList (EffectorID , RoutineID) VALUES (1 , 1), (2 , 1) , (1 , 2) , (2 , 2);
 
+
+-- tests
 SELECT * FROM Effectors AS e LEFT JOIN IPAddressSpace AS ip ON e.IP_Address = ip.IP_Address;
 SELECT * FROM EffectorType;
 
