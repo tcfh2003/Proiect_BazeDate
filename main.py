@@ -95,6 +95,11 @@ def add_routine():
         start_time = request.form['start_time']
         stop_time = request.form['stop_time']
 
+        if start_time == 'NULL':
+            start_time = None
+        if stop_time == 'NULL':
+            stop_time = None
+
         cursor = mysql.connection.cursor()
         cursor.execute("INSERT INTO Routine (RoutineName, Routine_RunTime, Start_Time, Stop_Time) VALUES (%s, %s, %s, %s)",
                        (routine_name, routine_runtime, start_time, stop_time))
