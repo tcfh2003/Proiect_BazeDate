@@ -17,6 +17,7 @@ mysql = MySQL(app)
 # print(mysql)
 
 def hash_password(password):
+    # this function generates the hash for a provided password in string format
     password = password.encode('utf-8')
     hash = hashlib.sha256(password)
     return hash.hexdigest()
@@ -94,6 +95,11 @@ def add_routine():
         start_time = request.form['start_time']
         stop_time = request.form['stop_time']
 
+        if start_time == 'NULL':
+            start_time = None
+        if stop_time == 'NULL':
+            stop_time = None
+
         cursor = mysql.connection.cursor()
         cursor.execute("INSERT INTO Routine (RoutineName, Routine_RunTime, Start_Time, Stop_Time) VALUES (%s, %s, %s, %s)",
                        (routine_name, routine_runtime, start_time, stop_time))
@@ -104,12 +110,18 @@ def add_routine():
 
 @app.route('/modify_routine', methods=['POST'])
 def modify_routine():
+    global modify_routine_status
     if request.method == 'POST':
         routineID = request.form['routineID']
         routine_name = request.form['routine_name']
         routine_runtime = request.form['routine_runtime']
         start_time = request.form['start_time']
         stop_time = request.form['stop_time']
+
+        if start_time == 'NULL':
+            start_time = None
+        if stop_time == 'NULL':
+            stop_time = None
 
         cursor = mysql.connection.cursor()
         cursor.execute("SELECT COUNT(*) FROM Routine WHERE RoutineID = %s", (routineID,))

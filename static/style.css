@@ -1,0 +1,23 @@
+html{
+    background: linear-gradient(silver, lightslategray);
+    min-height: 100%;
+    font-family: Consolas, "Times New Roman";
+}
+table, th, td{
+    border: 2px solid black;
+    background: mintcream;
+}
+th{
+    height: 40px;
+}
+label{
+    padding-left: 20px;
+}
+button{
+    margin-left: 20px
+}
+input[type=text]{
+    background: mintcream;
+    border: 1px solid black;
+
+}
